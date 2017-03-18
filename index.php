@@ -13,32 +13,30 @@
     <!-- Bootstrap core CSS -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
 
-
-    <!-- Custom styles for this template -->
+    <!-- CSS for coursePlanner draft -->
     <link href="../css/draft.css" rel="stylesheet">
+	
   </head>
 
   <body>
 	
 		<!-- Page Header -->
 		<div class="pageHeader">
-			<?php require 'nav.php'; ?>
+			<?php require 'navbar.php'; ?>
 		</div>
 
 		<div class="container">
 		
 			<div class="row">
 			
-				<!-- Simple Form -->
+				<!-- Form Column-->
 				<div class="col-md-6 col-sm-12">
 				
-					<h4 class="header">Select degree</h4>
+					<h4 class="header">Select program</h4>
 					
 					<!-- Degree Dropdown -->
 					<div class="form-group">
-						<select class="form-control" id="degreeDropdown">
-							<option>-</option>
-						</select>
+						<?php include 'views/program_dropdown.php'; ?>
 					</div>
 					
 					<!-- Save Button -->
@@ -51,19 +49,19 @@
 					
 					<br><br><br><br>
 					
-					<!-- Save Report -->
+					<!-- Save Report ->
 					<div class="subheader">DB Report</div>
 					<samp id="report"></samp>
 					
-					<br><br>
+					<br><br>-->
 					
-					<!-- Test Data -->
+					<!-- Test Data
 					<div class="subheader">$_SESSION['courses'] <i>array</i></div>
-					<samp id="test"></samp>
+					<samp id="test"></samp> -->
 				
 				</div>
 				
-				<!-- Results -->
+				<!-- Results Column -->
 				<div class="col-md-6 col-sm-12">
 				
 					<p id="output"></p>
@@ -96,7 +94,7 @@
 	// Page Initialization
 	//---------------------
 	//  - loads '_completed' from SESSION vars, if any
-	$.get("load.php", function(result) {
+	$.get("scripts/load_completed.php", function(result) {
 		
 		// Pass session array
 		_completed = JSON.parse(result);
@@ -105,30 +103,39 @@
 		if (!_completed) _completed = [];
 		
 		// TESTING - Output array for testing purposes
-		updateCompleted ("#test");
+		//updateDBReport ("#test");
 	});
 
+				
 	
-	// 'Degree' Dropdown
+	/*/ 'Degree' Dropdown
 	//-------------------
-	//	- loads 'degrees' JSON
-	$.get("json.php", function(data) {
-				
-		// Define vars
-		var degrees = JSON.parse(data).degrees;
-			
-		// Update degree dropdown
-		for (var i in degrees) {
-			$("#degreeDropdown").append("<option value=" + i + ">" + degrees[i].title + " (" + degrees[i].dept + ")</option>");
-		}
-				
+	$.getJSON('data/programs.json', function(data) {
+		
 		// Update 'Output' column
-		$("#degreeDropdown").change(function () {
+		$('#programDropdown').change(function () {
 				
-			displayButtons(degrees[$(this).val()].requirements, "#output");
+			displayButtons(data[$(this).val()].requirements, '#output');
 			// Populate with buttons
 		});
+	})
+		.done (function(data) {
+			//displayButtons(data[$('#programDropdown').val()].requirements, '#output');
+		});*/
+	
+	// WORKIN ON IT
+	// Draw initial buttons
+	loadProgram ($('#programDropdown').val(), '#output');
+	//$('#output').load('views/program_buttons.php?id=' + $('#programDropdown').val());
+	
+	// Update 'Output' column
+	$('#programDropdown').change(function () {
+				
+		// Populate with buttons
+		loadProgram ($(this).val(), '#output');
+		//$('#output').load('views/program_buttons.php?id=' + $(this).val());
 	});
+	
 	
 	// 'Save' Button - Click
 	//-----------------------
@@ -136,7 +143,7 @@
 	$("#save").click(function() {
 		
 		// Convert '_completed' array to SESSION var
-		$.post("save.php", {"completed":_completed}, function(result){
+		$.post("scripts/save_completed.php", {"completed":_completed}, function(result){
 			
 			// Animate saving process
 			$("#save").attr('disabled', true);
@@ -144,16 +151,52 @@
 			$("#saveResult").delay(700).fadeOut("slow");
 			
 			// TESTING - Output array for testing purposes
-			updateCompleted ("#test");
+			//updateDBReport ("#test");
 		});
 		
 	});
 		
+	// FUNCTION - 
+	function loadProgram (programID, outputID) {
+		$(outputID).load('views/program_buttons.php?id=' + programID, function() {
+			
+			// Button Event - Setup button toggle
+			//	- each click adds or removes a courses from '_completed' array
+			$('.cbtn').popover();
+			$(".cbtn").click(function () {
+					
+				// Set - COMPLETED
+				if ($(this).hasClass('btn-secondary')) { 
+					$(this).removeClass('btn-secondary');
+					$(this).addClass('btn-success');
+						
+					// Add courseString to 'completed'
+					if (_completed.indexOf($(this).attr('id')) < 0) {
+						_completed.push ($(this).attr('id'));
+					}
+					
+				// Set - NOT COMPLETED	
+				} else if ($(this).hasClass('btn-success')) {
+					$(this).removeClass('btn-success');
+					$(this).addClass('btn-secondary');
+					
+					// Remove courseString to 'completed'
+					var index = _completed.indexOf($(this).attr('id'));
+					_completed.splice(index, 1);
+				}
+				
+				// Enable 'Save' button
+				$("#save").attr('disabled', false);
+				
+			});
+		});
 		
-		
-		
+	}
+	
+	
+	
 	// FUNCTION - updates <div="[output_ID param]"> with test data
-	function updateCompleted (outputID) {
+	function updateDBReport (outputID) {
 		
 		$(outputID).html("");
 		for (var i in _completed) {
@@ -179,15 +222,13 @@
 			
 			// Start centered row
 			$(outputID).append("<div class='row justify-content-around' id='reqGroup" + j + "'>");
-			
 			// Append course buttons
 			for (var k in reqJSON[j].courses) {
 				var c = new Course (reqJSON[j].courses[k]);
 				var btn_class = "btn-secondary";
 				
-				
 				// If course has been completed
-				if (_completed) {
+				if (typeof _completed !== 'undefined') {
 					if (_completed.indexOf(c.prefix + c.number) >= 0) {
 						btn_class = "btn-success";
 					}

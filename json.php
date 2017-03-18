@@ -1,6 +1,7 @@
 {
     "degrees": [
         {
+			"type":"BS",
 			"dept":"CS",
 			"title":"Computer Science",
 			"requirements":[
@@ -32,6 +33,7 @@
 			]
 		},
 		{
+			"type":"BS",
 			"dept":"CIS",
 			"title":"Computer Information Systems",
 			"requirements":[
@@ -68,7 +70,8 @@
 			]
 		},
 		{
-			"dept":"BBA",
+			"type":"BBA",
+			"dept":"ECON",
 			"title":"Economics",
 			"requirements":[
 				{
@@ -94,6 +97,7 @@
 			]
 		},
         {
+			"type":"BSEE",
 			"dept":"ECE",
 			"title":"Electrical Engineering",
 			"requirements":[

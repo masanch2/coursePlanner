@@ -22,7 +22,7 @@
 	
 		<!-- Page Header -->
 		<div class="pageHeader">
-			<?php require 'nav.php'; ?>
+			<?php require 'navbar.php'; ?>
 		</div>
 
 		<div class="container">
@@ -54,7 +54,7 @@
 				</div>
 				<div class="col-md-6">
 				
-					<div class="scroll" id="output"></div>
+					<div id="output"></div>
 				
 				</div>
 			
@@ -81,8 +81,8 @@
 <script>
 	
 	// On Resize - fix output height
-	$(document).ready(fixOutput);
-	$(window).resize(fixOutput);
+	//$(document).ready(fixOutput);
+	//$(window).resize(fixOutput);
 
 	function fixOutput() {
 		$("#output").height($(window).height()-200);
@@ -120,44 +120,6 @@
 			});
 	});
 	
-	function drawCourse (c)
-	{
-		// start with empty string
-		var html = "";
-
-		// build course HTML String
-		//html = "(" + c.prefix + "-" + c.courseNumber + ") " + c.title + " - " + c.term;
-		//c.title + " (" + c.prefix + "-" + c.courseNumber + ") - " + c.term;
-		
-		// build course button
-		html = '<button type="button" class="btn btn-secondary">' + c.prefix + "-" + c.courseNumber + '</button>';
-		
-		/*/ Card
-		html += '<div class="card">';
-		html +=   '<div class="card-block">';
-		html +=     '<h4 class="card-title">' + c.title + '</h4>';
-		html +=     '<h6 class="card-subtitle mb-2 text-muted">(' + c.prefix + '-' + c.courseNumber + ')</h6>';
-		html +=     '<p class="card-text">' + c.description + '</p>';
-		html +=     '<a href="#" class="card-link">Card link</a>';
-		html +=     '<a href="#" class="card-link">Another link</a>';
-		html +=   '</div>';
-		html += '</div>';
-		
-		// Card 2
-		html += '<div class="card">';
-		html +=   '<h5 class="card-header">';
-		html +=     c.prefix + '-' + c.courseNumber;
-		html +=   '</h5>';
-		html +=   '<div class="card-block">';
-		html +=     '<h4 class="card-title">' + c.title + '</h4>';
-		html +=     '<p class="card-text">' + c.description + '</p>';
-		//html +=     '<a href="#" class="btn btn-primary">Go somewhere</a>';
-		html +=   '</div>';
-		html += '</div>';*/
-		
-		return html
-	}
-	
 	function drawAccordianCard (c, i) {
 		
 		var html = "";
@@ -167,7 +129,7 @@
 		html += 	'<div class="card-header" role="tab" id="heading' + i + '">';
 		html += 	  '<h5 class="mb-0 float-left">';
 		html += 		'<a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse' + i + '" aria-expanded="false" aria-controls="collapse' + i + '">';
-		html += 		  c.prefix + "-" + c.courseNumber;
+		html += 		  c.prefix + "-" + c.courseNumber + " - " + c.title;
 		html += 		'</a>';
 		html += 	  '</h5>';
 		html +=		  '<span class="float-right">';
@@ -176,11 +138,10 @@
 		html += 	'</div>';
 		html += 	'<div id="collapse' + i + '" class="collapse" role="tabpanel" aria-labelledby="heading' + i + '">';
 		html += 	  '<div class="card-block">';
-		html +=			'<h4 class="card-title">' + c.title + '</h4>';
-		html += 		'<p class="card-text">' + c.description + '</p>';
+		html += 		'<p class="card-text"><small>' + c.description + '</small></p>';
 		html += 	  '</div>';
 		html += 	'</div>';
-		html += '</div>';
+		html += '</div><!-- card -->';
 		
 		return html;
 	}

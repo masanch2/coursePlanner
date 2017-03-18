@@ -1,58 +1,64 @@
 <?php
-	
+
 	session_start();
+
+	require 'tools/database.php';
 	
-	if (isset($_POST['user']) && isset($_POST['pass'])) {
-		$user = $_POST['user'];
-		$pass = $_POST['pass'];
-		$pass2 = $_POST['pass2'];
-		$program = $_POST['program'];
+	
+	// Detect user login
+	if (isset($_SESSION['user_id'])) {
 		
 		// connect to database
-		$conn = mysql_connect('localhost', 'masanch2', '495297') or die (mysql_error());
+		Database::connect();
 		
-		$db = mysql_select_db('masanch2', $conn);
-		
-		
-		if ($pass == $pass2) {
-			$sql="SELECT * FROM users WHERE username='$user' and password='$pass'";
-			$result=mysql_query($sql);
-					
-			// Mysql_num_row is counting table row
-			$count=mysql_num_rows($result);
+		// Process form POST vars
+		if (isset($_POST['program'])) {
 			
-			if (!$count) {
-				
-				echo $program;
-				// Insert new user info into DB
-				$query = "INSERT INTO users (username, password, program, date_joined) VALUES ('$user', '$pass', '$program', '". time() ."')";
-				mysql_query($query) or die ('query failed');
-				
-				// Now, select user info to get ID
-				$sql = "SELECT * FROM users WHERE username='$user' and password='$pass'";
-				$result = mysql_query($sql);
-				$id = mysql_fetch_assoc($result)['id'];
-				
-				// Set session vars
-				$_SESSION['user_id'] = $id;
-				$_SESSION['user_name'] = $user;
-				$_SESSION['user_program'] = $program;
-				
-				header("location:dashboard.php");
-			} else {
-				echo "User name already exists.";
-			}
+			// Store POST vars
+			$program = $_POST['program'];
+			$profile = mysql_real_escape_string($_POST['profile']);
 			
+			// Update DB 'user' - last date logged in value
+			$sql = "UPDATE users SET program='". $program ."', profile='". $profile ."' WHERE id='". $_SESSION['user_id'] ."'";
+			mysql_query($sql);
+		
+			// Update SESSION vars
+			$_SESSION['user_program'] = $program;
+			
+			// Redirect to dash
+			header("location:dashboard.php");
+		
+		
+		/* All this just to display the profile..
+			Every other var needed is stored in the SESSION already! 
+		------------------------------------------------------------ */
 		} else {
-			echo "Passwords don't match!";
+			
+			// Get id from session
+			$id = $_SESSION['user_id'];
+
+			// Check db for login data
+			$result = mysql_query("SELECT * FROM users WHERE id='$id'");
+			
+			// Mysql_num_row is counting table row
+			$count = mysql_num_rows($result);
+			
+			// If result matched $myusername and $mypassword, table row must be 1 row
+			if($count==1){
+				$u = mysql_fetch_assoc($result);
+			}
 		}
+			
+		// disconnect from database
+		Database::disconnect();
+	
+	} else {
 		
-		mysql_close();
+		// Redirect to login page with error
+		header("location:login.php?login_error=true");
 	}
-	
-	
+
 ?>
-		
 
 <!DOCTYPE html>
 <html lang="en">
@@ -68,7 +74,8 @@
     <!-- Bootstrap core CSS -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
 
-    <!-- CSS for coursePlanner draft -->
+
+    <!-- Custom styles for this template -->
     <link href="../css/draft.css" rel="stylesheet">
   </head>
 
@@ -82,34 +89,26 @@
 		<div class="container">
 		
 			<div class="row">
-			
-				<div class="col-md-4">
-	
-					<form class="form" action='register.php' enctype='multipart/form-data' method='post'>
-						<div class="form-group">
-							<label>Username: </label><br>
-							<input class="form-control" type='text' name="user" <?php if (isset($_POST['user'])) echo 'value="'. $_POST['user'] .'"'; ?>/>
-						</div>
-						<div class="form-group">
-							<label>Password: </label><br>
-							<input class="form-control" type='password' name="pass" />
-						</div>
-						<div class="form-group">
-							<label>Retype Password: </label><br>
-							<input class="form-control" type='password' name="pass2" />
-						</div>
+				<div class="col-4">
+				
+					<h4 class="header">Edit profile</h4>
+					
+					<form class="form" action='profile.php' enctype='multipart/form-data' method='post'>
 						<div class="form-group">
 							<label>Program</label>
 							<?php include 'views/program_dropdown.php'; ?>
 						</div>
-						
-
-					
-						<input class="btn btn-primary" type='submit' text="Register" />
+						<div class="form-group">
+							<label>Profile</label>
+							<textarea class="form-control" name="profile" rows="3"><?php echo $u['profile']; ?></textarea>
+						</div>
+						<input type="submit" class="btn btn-primary" value="Save"/>
+						<a href="dashboard.php" class="btn btn-secondary">Nevermind</a>
 					</form>
-		
+					
 				</div>
-		
+			
+			
 			</div><!-- row -->
 
 			<hr>
@@ -117,7 +116,6 @@
 			<footer>
 				<p>Course Planner 2017</p>
 			</footer>
-			
 		</div> <!-- /container -->
 
 

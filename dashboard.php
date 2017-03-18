@@ -1,29 +1,66 @@
+<?php 
 
+	session_start();
+
+	require_once 'models/course.php';
+	require_once 'models/program.php';
+	require_once 'tools/database.php';
+
+	// Check for login
+	if (isset($_SESSION['user_id'])) {
+		
+		$id = $_SESSION['user_id'];
+		
+		// connect to database
+		Database::connect();
+
+		// Check db for login data
+		$result = mysql_query("SELECT * FROM users WHERE id='$id'");
+		
+		// Mysql_num_row is counting table row
+		$count = mysql_num_rows($result);
+		
+		// If result matched $myusername and $mypassword, table row must be 1 row
+		if($count==1){
+			$u = mysql_fetch_assoc($result);
+		}
+		
+		// Get program data from user's selected program code
+		if ($u['program']) $prog =  new Program($u['program']);
+		
+		Database::disconnect();
+		
+	} else {
+		
+		// Redirect to login page with error
+		header("location:login.php?login_error=true");
+	}
+	
+?>
 
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <!-- <link rel="icon" href="../../favicon.ico"> -->
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="description" content="">
+		<meta name="author" content="">
+		<!-- <link rel="icon" href="../../favicon.ico"> -->
 
-    <title>Course Planner</title>
+		<title>Course Planner</title>
 
-    <!-- Bootstrap core CSS -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+		<!-- Bootstrap core CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
 
+		<!-- CSS for coursePlanner draft -->
+		<link href="../css/draft.css" rel="stylesheet">
+	</head>
 
-    <!-- Custom styles for this template -->
-    <link href="../css/draft.css" rel="stylesheet">
-  </head>
-
-  <body>
+	<body>
 	
 		<!-- Page Header -->
 		<div class="pageHeader">
-			<?php require 'nav.php'; ?>
+			<?php require 'navbar.php'; ?>
 		</div>
 
 		<div class="container">
@@ -32,17 +69,30 @@
 			
 				<div class="col-md-6">
 				
-					<h5 class="header">Welcome, <?php echo $_SESSION['user_name']; ?></h5>
+					<h5 class="header">Welcome, <?php echo $u['username']; ?></h5>
 					
 					<p>
-						Eventually, you'll be able edit a profile & upload a pic or something..
+						<strong>Program:</strong> <?php echo $u['program'] ? $prog->title .' ('. $prog->type .')' : 'Undecided'; ?>
 					</p>
+					<p>
+						<strong>Profile:</strong>
+						
+						<br>
+						<?php echo $u['profile']; ?>
+						
+					</p>
+					
+					<br><br>
+					<h6 class="header">From here you can:</h6>
+					- <a href="index.php">Add courses</a><br>
+					- <a href="summary.php">Check upcoming classes</a><br>
+					- <a href="profile.php">Edit your profile</a>
 				
 				</div>
 				<div class="col-md-6">
 					
 					<!-- Test Data -->
-					<div class="subheader">Completed Courses</div>
+					<h6 class="header">Completed Courses</h6>
 					<samp id="test"></samp>
 					
 				</div>
@@ -68,7 +118,7 @@
 </html>
 
 <script>
-	$.get("load.php", function(result) {
+	$.get("scripts/load_completed.php", function(result) {
 		
 		// Pass session array
 		_completed = JSON.parse(result);
@@ -81,13 +131,5 @@
 			$("#test").append(_completed[i] + "<br>");
 		}
 	});
-	
-	// CLASS - convert course string into an object with two props: prefix, number
-	function Course (courseString) {
-		var firstDigit = courseString.indexOf(courseString.match(/\d/));
-		
-		this.prefix = courseString.slice(0, firstDigit);
-		this.number = courseString.slice(firstDigit, courseString.length);
-	}
 	
 </script>

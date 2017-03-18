@@ -40,10 +40,10 @@
 		while($row = mysql_fetch_assoc($result)) {
 			
 			// If course has DB record, but it not in SESSION anymore
-			if (array_search($row['course_string'], $_SESSION['completed']) === false) {
+			if (array_search($row['course_id'], $_SESSION['completed']) === false) {
 				
 				// Remove DB record
-				$sql = "DELETE FROM registrations WHERE user_id='". $userID ."' AND course_string='". $row['course_string'] ."'";
+				$sql = "DELETE FROM registrations WHERE user_id='". $userID ."' AND course_id='". $row['course_id'] ."'";
 				mysql_query($sql);
 				
 				$out += 1;
@@ -55,19 +55,19 @@
 		foreach ($_SESSION['completed'] as $cString) {
 				
 			// Check DB for record with $cString
-			$sql = "SELECT * FROM registrations WHERE user_id='". $userID ."' AND course_string='". $cString ."'";
+			$sql = "SELECT * FROM registrations WHERE user_id='". $userID ."' AND course_id='". $cString ."'";
 			$result = mysql_query($sql);
 				
 			// If course doesn't exist, INSERT it
 			if (mysql_num_rows($result) == 0) {
-				$sql = "INSERT INTO registrations (user_id, course_string, completed) VALUES ('". $userID ."', '". $cString ."', true)";
+				$sql = "INSERT INTO registrations (user_id, course_id, completed) VALUES ('". $userID ."', '". $cString ."', true)";
 				mysql_query ($sql);
 					
 				$in += 1;
 			}
 		}
 		
-		
+		// Generate quick report info
 		$report .= '- Inserted '. $in .' records<br>';
 		$report .= '- Removed '. $out .' records<br>';
 		$report .= 'DB records total: '. ($count - $out + $in);

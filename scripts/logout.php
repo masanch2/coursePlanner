@@ -6,6 +6,6 @@
 	unset($_SESSION['user_name']); 
 	unset($_SESSION['completed']);  
 	
-	header("Location: login.php");
+	header("Location: ../login.php");
 	
 ?>

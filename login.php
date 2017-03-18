@@ -2,22 +2,22 @@
 
 	session_start();
 
+	require 'tools/database.php';
+
 	if (isset($_POST['user'])) {
 		
 		$user = $_POST['user'];
 		$pass = $_POST['pass'];
 		
 		// connect to database
-		$conn = mysql_connect('localhost', 'masanch2', '495297') or die (mysql_error());
-		
-		$db = mysql_select_db('masanch2', $conn);
-
+		Database::connect();
 		// Check db for login data
+
 		$sql="SELECT * FROM users WHERE username='$user' and password='$pass'";
-		$result=mysql_query($sql);
+		$result = mysql_query($sql);
 				
 		// Mysql_num_row is counting table row
-		$count=mysql_num_rows($result);
+		$count = mysql_num_rows($result);
 
 		// If result matched $myusername and $mypassword, table row must be 1 row
 		if($count==1){
@@ -28,28 +28,32 @@
 			// Register $myusername, $mypassword and redirect to file "login_success.php"
 			$_SESSION['user_id'] = $array['id'];
 			$_SESSION['user_name'] = $array['username'];
+			$_SESSION['user_program'] = $array['program'];
 			
+			// Update user last date logged in value
+			$sql = "UPDATE users SET date_last='". time() ."' WHERE id='". $_SESSION['user_id'] ."'";
+			mysql_query($sql);
 			
 			// Convert DB records to '_completed'
 			$sql = "SELECT * FROM registrations WHERE user_id='". $_SESSION['user_id'] ."'";
 			$result = mysql_query($sql);
 			
+			// Store '_completed' in SESSION
 			$courses = [];
 			while($row = mysql_fetch_assoc($result)) {
-				array_push($courses, $row['course_string']);
+				array_push($courses, $row['course_id']);
 			}
 			$_SESSION['completed'] = $courses;
 			
+			// Redirect to user dashboard
 			header("location:dashboard.php");
 		} else {
 			echo "Wrong Username or Password";
 		}
 		
-		mysql_close();
+		Database::disconnect();
 	}
 	
-
-		
 ?>
 
 <!DOCTYPE html>
@@ -66,8 +70,7 @@
     <!-- Bootstrap core CSS -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
 
-
-    <!-- Custom styles for this template -->
+    <!-- CSS for coursePlanner draft -->
     <link href="../css/draft.css" rel="stylesheet">
   </head>
 
@@ -75,10 +78,16 @@
 	
 		<!-- Page Header -->
 		<div class="pageHeader">
-			<?php require 'nav.php'; ?>
+			<?php require 'navbar.php'; ?>
 		</div>
 
 		<div class="container">
+	
+			<?php
+				if (isset($_GET['login_error'])) {
+					echo '<div class="alert alert-danger" role="alert"><strong>Oh snap!</strong> You need to be logged in first..</div>';
+				}
+			?>
 		
 			<div class="row">
 			
@@ -87,12 +96,12 @@
 				<form method="post">
 				
 					<div class="form-group">
-						<label for="exampleInputEmail1">Username</label>
+						<label>Username</label>
 						<input type="text" class="form-control" name="user">
 					</div>
 				
 					<div class="form-group">
-						<label for="exampleInputEmail1">Password</label>
+						<label>Password</label>
 						<input type="password" class="form-control" name="pass">
 					</div>
 					
@@ -121,15 +130,3 @@
 
 	</body>
 </html>
-
-<script>
-	
-	// CLASS - convert course string into an object with two props: prefix, number
-	function Course (courseString) {
-		var firstDigit = courseString.indexOf(courseString.match(/\d/));
-		
-		this.prefix = courseString.slice(0, firstDigit);
-		this.number = courseString.slice(firstDigit, courseString.length);
-	}
-	
-</script>
