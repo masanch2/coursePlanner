@@ -21,7 +21,7 @@
   <body>
 	
 		<!-- Page Header -->
-		<div class="pageHeader">
+		<div class="pageHeader" id="pageHeader">
 			<?php require 'navbar.php'; ?>
 		</div>
 
@@ -94,13 +94,11 @@
 	// Page Initialization
 	//---------------------
 	//  - loads '_completed' from SESSION vars, if any
-	$.get("scripts/load_completed.php", function(result) {
+	$.get("scripts/load_session.php", function(result) {
 		
 		// Pass session array
-		_completed = JSON.parse(result);
-		
-		// If empty, create new array
-		if (!_completed) _completed = [];
+		_completed = JSON.parse(result).completed;
+		_current = JSON.parse(result).current;
 		
 		// TESTING - Output array for testing purposes
 		//updateDBReport ("#test");
@@ -143,12 +141,15 @@
 	$("#save").click(function() {
 		
 		// Convert '_completed' array to SESSION var
-		$.post("scripts/save_completed.php", {"completed":_completed}, function(result){
+		$.post("scripts/save_session.php", {"completed":_completed, "current":_current}, function(result){
 			
 			// Animate saving process
 			$("#save").attr('disabled', true);
 			$("#saveResult").html(result).fadeIn(1);
 			$("#saveResult").delay(700).fadeOut("slow");
+			
+			// Update navbar with summary
+			$('#pageHeader').load('navbar.php');
 			
 			// TESTING - Output array for testing purposes
 			//updateDBReport ("#test");
@@ -162,7 +163,6 @@
 			
 			// Button Event - Setup button toggle
 			//	- each click adds or removes a courses from '_completed' array
-			$('.cbtn').popover();
 			$(".cbtn").click(function () {
 					
 				// Set - COMPLETED
@@ -184,6 +184,42 @@
 					var index = _completed.indexOf($(this).attr('id'));
 					_completed.splice(index, 1);
 				}
+				
+				/*/ Set - COMPLETED
+				if ($(this).hasClass('btn-secondary')) { 
+					$(this).removeClass('btn-secondary');
+					$(this).addClass('btn-success');
+						
+					// Add courseString to 'completed'
+					if (_completed.indexOf($(this).attr('id')) < 0) {
+						_completed.push ($(this).attr('id'));
+					}
+					
+				// Set - CURRENTLY
+				} else if ($(this).hasClass('btn-success')) {
+					
+					$(this).removeClass('btn-success');
+					$(this).addClass('btn-warning');
+					
+					// Remove courseString to 'completed'
+					var index = _completed.indexOf($(this).attr('id'));
+					_completed.splice(index, 1);
+						
+					// Add courseString to 'current'
+					if (_current.indexOf($(this).attr('id')) < 0) {
+						_current.push ($(this).attr('id'));
+					}
+				
+				// Set - INCOMPLETE
+				} else if ($(this).hasClass('btn-warning')) {
+				
+					$(this).removeClass('btn-warning');
+					$(this).addClass('btn-secondary');
+					
+					// Remove courseString to 'current'
+					var index = _current.indexOf($(this).attr('id'));
+					_current.splice(index, 1);
+				}*/
 				
 				// Enable 'Save' button
 				$("#save").attr('disabled', false);

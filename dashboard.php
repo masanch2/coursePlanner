@@ -118,13 +118,10 @@
 </html>
 
 <script>
-	$.get("scripts/load_completed.php", function(result) {
+	$.get("scripts/load_session.php", function(result) {
 		
 		// Pass session array
-		_completed = JSON.parse(result);
-		
-		// If empty, create new array
-		if (!_completed) _completed = [];
+		_completed = JSON.parse(result).completed;
 		
 		$("#test").html("");
 		for (var i in _completed) {

@@ -4,6 +4,7 @@
 	
 	// Overwrite SESSION array with '_completed' which represents FINAL USER INPUT
 	$_SESSION['completed'] =  $_POST['completed'];
+	$_SESSION['current'] = $_POST['current'];
 	
 	// Start 'save' report
 	$report = '';

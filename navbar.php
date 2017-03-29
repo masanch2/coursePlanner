@@ -27,32 +27,13 @@
 					<div class="collapse navbar-collapse" id="navbarText">
 				  
 						<ul class="navbar-nav mr-auto">
-					
-							<li class="nav-item dropdown <?php echo $userActive; ?>">
-								<a class="nav-link dropdown-toggle" href="http://example.com" id="navbarUserLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-									User
-								</a>
-								<div class="dropdown-menu">
-									<?php
-										
-										if (isset($_SESSION['user_name'])) {
-											echo '<a class="dropdown-item" href="dashboard.php">Dashboard</a>';
-											echo '<a class="dropdown-item" href="scripts/logout.php">Logout</a>';
-										} else {
-											echo '<a class="dropdown-item" href="login.php">Login</a>';
-											echo '<a class="dropdown-item" href="register.php">Register</a>';
-										}
-									
-									?>
-								</div>
-							</li>
 							
 							<li class="nav-item dropdown">
 								<a class="nav-link dropdown-toggle <?php echo $coursesActive; ?>" href="http://example.com" id="navbarCoursesLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 									Courses
 								</a>
 								<div class="dropdown-menu" aria-labelledby="navbarCoursesLink">
-									<a class="dropdown-item" href="index.php">By Degree</a>
+									<a class="dropdown-item" href="index.php">By Program</a>
 									<a class="dropdown-item" href="search.php">By Search</a>
 								</div>
 							</li>
@@ -65,8 +46,27 @@
 							?>
 							
 						</ul>
+					</div>
 					
-				  </div>
-				  
+					<?php
+					
+						if (isset($_SESSION['user_name'])) {
+							echo '<span class="navbar-text small">Logged in as: </span>
+							<ul class="navbar-nav">
+								<li class="nav-item dropdown">
+									<a class="nav-link btn dropdown-toggle active" href="dashboard.php" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'
+										. $_SESSION['user_name'] .
+									'</a>
+									<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+										<a class="dropdown-item" href="dashboard.php">Dashboard</a>
+										<a class="dropdown-item" href="scripts/logout.php">Logout</a>
+									</div>
+								</li>
+							</ul>';
+						} else {
+							echo '<span class="navbar-text small">Need to <a href="login.php">login</a> or <a href="register.php">sign up</a>?</span>';
+						}
+					?>
+					
 				</nav>
 			</div><!-- container -->

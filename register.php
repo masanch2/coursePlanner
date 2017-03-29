@@ -1,4 +1,4 @@
-<?php
+ <?php
 	
 	session_start();
 	
@@ -87,24 +87,23 @@
 	
 					<form class="form" action='register.php' enctype='multipart/form-data' method='post'>
 						<div class="form-group">
-							<label>Username: </label><br>
+							<label>Username</label><br>
 							<input class="form-control" type='text' name="user" <?php if (isset($_POST['user'])) echo 'value="'. $_POST['user'] .'"'; ?>/>
 						</div>
 						<div class="form-group">
-							<label>Password: </label><br>
+							<label>Password</label><br>
 							<input class="form-control" type='password' name="pass" />
 						</div>
 						<div class="form-group">
-							<label>Retype Password: </label><br>
+							<label>Retype Password</label><br>
 							<input class="form-control" type='password' name="pass2" />
 						</div>
 						<div class="form-group">
 							<label>Program</label>
 							<?php include 'views/program_dropdown.php'; ?>
-						</div>
-						
-
-					
+							<small class="form-text text-muted">You can change this at any time.</small>
+  						</div>
+						<br>
 						<input class="btn btn-primary" type='submit' text="Register" />
 					</form>
 		

@@ -28,6 +28,11 @@
 						$btnClass = 'btn-success';
 					}
 				}
+				if (isset($_SESSION['current'])) {
+					if (array_search($c->prefix . $c->courseNumber, $_SESSION['current']) !== false) {
+						$btnClass = 'btn-warning';
+					}
+				}
 				
 				// Output course button
 				echo '<button type="button" class="btn cbtn '. $btnClass .'" id="'. $c->prefix . $c->courseNumber .'">'. strtoupper($c->prefix .'-'. $c->courseNumber) .'</button>';

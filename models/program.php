@@ -48,7 +48,7 @@
 		} // __construct
 		
 		// public function
-		public function getCourseStrings ()
+		public function required ()
 		{
 			$all = array();
 			
@@ -61,7 +61,7 @@
 			return $all;
 		}
 		
-		public function stillNeeded ($taken)
+		public function stillNeed ($taken)
 		{
 			$need = array ();
 			
@@ -71,13 +71,22 @@
 					$cString = $c->prefix . $c->courseNumber;
 					
 					if (array_search($cString, $taken) === false) {
-						array_push($need, $cString);
+						if(!count($need)) {
+							array_push($need, $cString);
+						} else {
+							$i = 0;
+							while (strcmp($cString, $need[$i]) > 0 && $i < count($need)) {
+								$i++;
+							}
+							array_splice($need, $i, 0, $cString);
+						}
 					}
 				}
 			}
 			
 			return $need;
 		}
+		
 	}
 
 ?>
