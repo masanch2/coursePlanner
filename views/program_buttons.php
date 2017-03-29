@@ -36,6 +36,9 @@
 				
 				// Output course button
 				echo '<button type="button" class="btn cbtn '. $btnClass .'" id="'. $c->prefix . $c->courseNumber .'">'. strtoupper($c->prefix .'-'. $c->courseNumber) .'</button>';
+				
+				//echo '<a id="popoverData" class="btn cbtn '. $btnClass .'" data-content="'. $c->description .'" rel="popover" data-placement="bottom" data-original-title="'. $c->title .'" data-trigger="hover">'. strtoupper($c->prefix .'-'. $c->courseNumber) .'</a>';
+				
 				//echo '<button type="button" class="btn cbtn '. $btnClass .'" id="'. $c->prefix . $c->courseNumber .'" data-content="'. $c->data->description .'" rel="popover" data-placement="bottom" data-original-title="'. $c->data->title .'" data-trigger="hover">'. strtoupper($c->prefix .'-'. $c->courseNumber) .'</button>';
 			}
 			

@@ -1,7 +1,7 @@
 <?php
 
 	session_start();
-
+	
 	require 'tools/database.php';
 
 	if (isset($_POST['user'])) {
@@ -29,6 +29,11 @@
 			$_SESSION['user_id'] = $array['id'];
 			$_SESSION['user_name'] = $array['username'];
 			$_SESSION['user_program'] = $array['program'];
+			
+			// Get rid of guest session if it's set
+			if (isset($_SESSION['guest_program'])) {
+				unset($_SESSION['guest_program']);
+			}  
 			
 			// Update user last date logged in value
 			$sql = "UPDATE users SET date_last='". time() ."' WHERE id='". $_SESSION['user_id'] ."'";
@@ -86,6 +91,9 @@
 			<?php
 				if (isset($_GET['login_error'])) {
 					echo '<div class="alert alert-danger" role="alert"><strong>Oh snap!</strong> You need to be logged in first..</div>';
+				}
+				if (isset($_GET['program_error'])) {
+					echo '<div class="alert alert-danger" role="alert"><strong>No Data!</strong> You can either login in or select a program as a guest <a href="index.php">here</a></div>';
 				}
 			?>
 		

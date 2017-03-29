@@ -5,7 +5,7 @@
 			$programs = json_decode($string);
 										
 			foreach ($programs as $id => $p) {
-				if ($id == $_SESSION['user_program']) {
+				if ($id == $_SESSION['user_program'] || $id == $_SESSION['guest_program']) {
 					echo '<option value="'. $id .'" selected>'. $p->title .' ('. $p->type .')</option>';
 				} else {
 					echo '<option value="'. $id .'">'. $p->title .' ('. $p->type .')</option>';

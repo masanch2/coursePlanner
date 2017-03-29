@@ -11,6 +11,10 @@
 		$coursesActive = 'active';
 	} else if ($doc =='summary.php') {
 		$summaryActive = 'active';
+	} else {
+		
+	// CHEAT kinda... this keeps the 'Courses' nav link highlighted when you click the 'Save' button on index.php
+		$coursesActive = 'active';
 	}
 
 ?>
@@ -40,8 +44,10 @@
 							
 							<?php
 								// 'Report' link will only be displayed in the navbar when completed courses are detected
-								if (isset($_SESSION['completed'])) {
+								if (isset($_SESSION['completed']) || isset($_SESSION['guest_program'])) {
 									echo '<li class="nav-item"><a class="nav-link '. $summaryActive .'" href="summary.php">Summary</a></li>';
+								} else {
+									echo '<li class="nav-item" id="summaryLink" hidden><a class="nav-link '. $summaryActive .'" href="summary.php">Summary</a></li>';
 								}
 							?>
 							

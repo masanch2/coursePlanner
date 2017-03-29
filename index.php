@@ -99,6 +99,7 @@
 		// Pass session array
 		_completed = JSON.parse(result).completed;
 		_current = JSON.parse(result).current;
+		_program = JSON.parse(result).program;
 		
 		// TESTING - Output array for testing purposes
 		//updateDBReport ("#test");
@@ -131,6 +132,12 @@
 				
 		// Populate with buttons
 		loadProgram ($(this).val(), '#output');
+		
+		// Set guess program
+		_program = $(this).val();
+		
+		// Enable 'Save' button
+		$("#save").attr('disabled', false);
 		//$('#output').load('views/program_buttons.php?id=' + $(this).val());
 	});
 	
@@ -141,8 +148,7 @@
 	$("#save").click(function() {
 		
 		// Convert '_completed' array to SESSION var
-		$.post("scripts/save_session.php", {"completed":_completed, "current":_current}, function(result){
-			
+		$.post("scripts/save_session.php", {"completed":_completed, "current":_current, "program":_program}, function(result){
 			// Animate saving process
 			$("#save").attr('disabled', true);
 			$("#saveResult").html(result).fadeIn(1);
@@ -160,6 +166,10 @@
 	// FUNCTION - 
 	function loadProgram (programID, outputID) {
 		$(outputID).load('views/program_buttons.php?id=' + programID, function() {
+			
+		
+			//$('.cbtn').popover({ trigger: "hover" });
+			
 			
 			// Button Event - Setup button toggle
 			//	- each click adds or removes a courses from '_completed' array
@@ -272,6 +282,8 @@
 				
 				// Course button HTML
 				$("#reqGroup" + j).append('<button type="button" class="btn cbtn ' + btn_class + '" id="' + c.prefix + c.number + '">' + (c.prefix + "-" + c.number).toUpperCase() + '</button>');
+			
+				
 			}
 		}
 		

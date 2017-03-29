@@ -82,6 +82,19 @@
 	// Users are NOT LOGGIN IN
 	//-------------------------
 	} else {
+		if (isset($_POST['program'])) {
+			
+			// No program was selected from dropdown
+			if ($_POST['program'] == '') {
+				$_SESSION['guest_program'] = null;
+				
+			// Set guest program
+			} else {
+				$_SESSION['guest_program'] = $_POST['program'];
+			}
+		}
+			
+			
 		$report .= "Session saved. (Not logged in)";
 	}
 	

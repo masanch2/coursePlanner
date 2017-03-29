@@ -6,10 +6,14 @@
 	session_start();
 	
 	// 
-	if (isset($_SESSION['user_program'])) {
+	if (isset($_SESSION['user_program']) || isset($_SESSION['guest_program'])) {
 		
 		// Testin stuff
-		$p = $_SESSION['user_program'];
+		if (isset($_SESSION['user_program'])) {
+			$p = $_SESSION['user_program'];
+		} else {
+			$p = $_SESSION['guest_program'];
+		}
 		
 		$prog = new Program($p);
 					
@@ -28,9 +32,8 @@
 		$need = $prog->stillNeed($skip);
 						
 	} else {
-		
 		// Redirect to login page with error
-		header("location:login.php?login_error=true");
+		header("location:login.php?program_error=true");
 	}
 	
 
@@ -86,6 +89,20 @@
 							echo $c .'<br>';
 						}
 					?>
+					
+					<br>
+					<?php
+						if (isset($_SESSION['completed'])) {
+							echo '<h6 class="header">Completed</h6>';
+						}
+					?>
+					<div id="completed">
+						<?php
+							foreach ($_SESSION['completed'] as $c) {
+								echo $c .'<br>';
+							}
+						?>
+					</div>
 					
 					<br>
 					<?php
@@ -229,7 +246,7 @@
 					}
 					
 					// Update 'available' column
-					updateCourses(data.courses);
+					updateCourses(show);
 					
 				});
 			}
@@ -271,16 +288,19 @@
 							
 							// Check for online
 							if (c.meetingTimes[0].method == "ONL") {
-								cHTML += '<b>Online</b><br>';
-							} else {
-							// Add all meetins times
-							for (var j in c.meetingTimes) {
-								// Loop ref
-								mt = c.meetingTimes[j];
-										
-								// Add meeting time
-								cHTML += '<b>' + mt.days + '</b> [' + mt.startTime + ' - ' + mt.endTime + ']<br>';
-							}
+								cHTML += '<b>[Online]</b><br>';
+							// Check for TBA
+							} else if (c.meetingTimes[0].room == "TBA"){
+								cHTML += '<b>[TBA]</b><br>';
+							}else {
+								// Add all meetins times
+								for (var j in c.meetingTimes) {
+									// Loop ref
+									mt = c.meetingTimes[j];
+											
+									// Add meeting time
+									cHTML += '<b>' + mt.days + '</b> [' + mt.startTime + ' - ' + mt.endTime + ']<br>';
+								}
 							}
 									
 						cHTML += '</div>';
