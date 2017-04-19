@@ -33,8 +33,9 @@
 	}
 	
 	// Set GLOBAL var - 'current_term'
+	//---------------------------------
 	$GLOBALS['current_term'] = $yr .'\/'. $termOrder[$curTerm];
-
+	
 	
 	
 	
@@ -43,8 +44,7 @@
 	$cNumber = '105a';
 	
 	
-	
-	// CURL request
+	// CURL request course data
 	//------------------
 	
 	// create curl resource 
@@ -73,27 +73,76 @@
 				
 	foreach ($courses as $c) {
 		
-		if (array_search($c->term, $terms) === false) {
-			array_push($terms, $c->term);
+		$termRef = $c->term;
+		
+		if (array_search($termRef, $terms) === false) {
+			if (!sizeof($terms)) {
+				array_push($terms, $termRef);
+			} else {
+				
+				$i = 0;
+				foreach ($terms as $t) {
+					
+					if (compareTerms($termRef, $t, $termOrder) < 0) {
+						break;
+					} else if ($i < sizeof($terms)) {
+						$i++;
+					}
+				}
+				
+				array_splice($terms, $i, 0, $termRef);
+			}
 		}
 	}
 	
 	// Set global var - 'terms' - array of every term currently in courses API
+	//--------------------------
 	$GLOBALS['terms'] = $terms;
 	
-	
-	
-	
-	
-	
-	//echo var_dump($terms);
-	
-	//echo $GLOBALS['current_term'] .'<br>';
-	//echo 'lkjlkj';
-	
-	function compareTerms($term1, $term2) {
-		echo $term1 .' - '. $term2 .'<br>';
+	function compareTerms($term1, $term2, $order) {
+		$t1yr = substr($term1, 0, 2);
+		$t1se = substr($term1, 3, 2);
+		$t1ord = array_search($t1se, $order);
+		
+		$t2yr = substr($term2, 0, 2);
+		$t2se = substr($term2, 3, 2);
+		$t2ord = array_search($t2se, $order);
+		
+		if ($t1yr < $t2yr) {
+			return -1;
+		} else if ($t1yr > $t2yr) {
+			return 1;
+		} else if ($t1yr == $t2yr) {
+			
+			if ($t1ord < $t2ord) {
+				return -1;
+			} else if ($t1ord > $t2ord) {
+				return 1;
+			} else if ($t1ord == $t2ord) {
+				return 0;
+			}
+		}
+		
 	}
 	
-
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 ?>

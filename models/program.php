@@ -13,7 +13,6 @@
 		// Constructor
 		public function __construct ($p_id, $getCourses = false) {
 			
-			
 			// Load 'programs' JSON
 			$string = file_get_contents('../data/programs.json');
 			if (!$string) $string = file_get_contents('data/programs.json');
@@ -31,17 +30,13 @@
 					
 					// Store requirements in $reqs array
 					foreach ($p->requirements as $j => $r) {
+						
 						$this->reqs[$j] = $r;
-						//echo $r->title .' - '. $j .'<br>';
-						//echo var_dump($reqs[$j]) .'<br>';
 						
 						// Convert course string to course objects
 						foreach ($this->reqs[$j]->courses as $k => $c) {
 							$this->reqs[$j]->courses[$k] = new Course($c, $getCourses);
-							
-							//echo $reqs[$j]->courses[$k]->data->title .', ';
 						}
-						//echo '<br>';
 					}
 				}
 			}

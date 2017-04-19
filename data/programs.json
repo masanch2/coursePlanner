@@ -1,5 +1,5 @@
 {
-    "CS.BS":{
+    "BS.CS":{
 		"type":"BS",
 		"dept":"CS",
 		"title":"Computer Science",
@@ -17,7 +17,7 @@
 			{
 				"title":"Ethics",
 				"credits":"3",
-				"courses":["phil205a", "phil210b"]
+				"courses":["phil205A!", "phil210B"]
 			},
 			{
 				"title":"Core",
@@ -54,7 +54,7 @@
 			{
 				"title":"Ethics",
 				"credits":"3",
-				"courses":["phil205a", "phil210b"]
+				"courses":["phil205A!", "phil210B"]
 			},
 			{
 				"title":"Core",
@@ -95,7 +95,7 @@
 			}
 		]
 	},
-       "BS.EE":{
+    "BS.EE":{
 		"type":"BSEE",
 		"dept":"ECE",
 		"title":"Electrical Engineering",
@@ -103,7 +103,7 @@
 			{
 				"title":"Foundation",
 				"credits":"37",
-				"courses":["chem111", "chem111L", "math161", "math162", "math261", "math262", "phil210b", "phys211", "phys211L", "phys212", "phys212L", "ece255"]
+				"courses":["chem111", "chem111L", "math161", "math162", "math261", "math262", "phil210B", "phys211", "phys211L", "phys212", "phys212L", "ece255"]
 			},
 			{
 				"title":"Engineering Core",
@@ -125,6 +125,95 @@
 				"credits":"0-3",
 				"courses":["cs316", "cs446", "cs451", "ece394", "ece394L", "ece490", "me356", "phys309" ,"phys332"]
 			}
+		]
+	},
+    "BA.PS":{
+		"type":"BA",
+		"dept":"PS",
+		"title":"Political Science",
+		"requirements":[
+			{
+				"title":"Required Courses",
+				"credits":"16",
+				"courses":["ps118", "ps123", "ps130!", "ps225!", "ps485"]
+			},
+			{
+				"title":"Theory and Culture",
+				"credits":"6",
+				"courses":["ps320", "ps321", "ps334", "ps339", "ps340", "ps341", "ps354", "ps375", "ps379", "ps389"]
+			},
+			{
+				"title":"American Political Institutions",
+				"credits":"9",
+				"courses":["ps240", "ps260", "ps262", "ps327", "ps328", "ps329", "ps330", "ps331", "ps333", "ps370"]
+			},
+			{
+				"title":"Public Policy",
+				"credits":"9",
+				"courses":["ps270", "ps319", "ps325", "ps342", "ps345", "ps346", "ps392", "ps496"]
+			},
+			{
+				"title":"International",
+				"credits":"9",
+				"courses":["ps205", "ps306", "ps307", "ps309", "ps326", "ps361", "ps362", "ps363", "ps368", "ps378"]
+			}
+		]
+	},
+	"GE":{
+		"type":"GE",
+		"dept":"",
+		"title":"General Education",
+		"requirements":[
+			{
+				"title":"Category 1 - Literature",
+				"credits":"3",
+				"courses":["engl202", "engl203", "engl204", "engl205", "mfl205", "phil220"]
+			},
+			{
+				"title":"Category 2 - Arts",
+				"credits":"3",
+				"courses":["art100", "art130!", "mus117a", "mus117b!", "mus117c", "mus117d", "mus117e", "mus117f", "thea128a", "thea128b!", "thea136", "thea137!"]
+			},
+			{
+				"title":"Category 3 - Numerical Understanding",
+				"credits":"4",
+				"courses":["econ235", "math120a", "math120b", "math125", "math132a", "math132b", "math140", "math161", "ps225!", "psyc299", "soc225"]
+			},
+			{
+				"title":"Category 4 - Natural Sciences",
+				"credits":"7",
+				"courses":["biol104a", "biol104b", "biol105a", "biol105b", "biol105c", "biol111a", "biol111b", "biol111c", "chem102a", "chem102b", "chem111", "chem111L", "geog101!", "phys106a", "phys106b", "phys106c", "phys107", "phys111", "phys111L", "phys211", "phys211L"]
+			},
+			{
+				"title":"Category 5 - Historical and Philosophical Ideas",
+				"credits":"3",
+				"courses":["hist100b", "hist100c", "hist100d", "hist100e", "hist110!", "phil123", "phil205A!", "phil205B!", "phil280", "rs100"]
+			},
+			{
+				"title":"Category 6 - Social Sciences",
+				"credits":"3",
+				"courses":["econ125", "geog202!", "ps118!", "psyc100", "soc112"]
+			},
+			{
+				"title":"Category 7 - Social Institutions",
+				"credits":"3",
+				"courses":["cj201!", "econ221", "ps123", "soc111"]
+			},
+			{
+				"title":"Category 8 - International Systems",
+				"credits":"3",
+				"courses":["geog201", "hist213", "hist215", "hist220", "phil213", "phil215", "ps130!", "soc280!"]
+			} ,
+			{
+				"title":"Category 9 - Oral Communication",
+				"credits":"3",
+				"courses":["comm105a", "comm105b", "comm105c", "fren111", "fren112", "fren211", "ger111", "ger112", "ger211", "japn111", "japn112", "japn211", "plsh111", "plsh112", "plsh211", "span111", "span211"]
+			} ,
+			{
+				"title":"Category 10 - Written Communication",
+				"credits":"3",
+				"courses":["engl212", "gs100", "hist111", "hum210", "phil114", "ps112", "rpw210"]
+			}          
 		]
 	}
 }

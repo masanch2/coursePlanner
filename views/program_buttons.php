@@ -3,11 +3,20 @@
 	session_start();
 
 	require_once '../models/program.php';
+	
 	if (isset($_GET['id'])) {
 		
+		// Pass GET params
 		$programID = $_GET['id'];
 		
-		$prog = new Program($programID);
+		if (isset($_GET['info']) && $_GET['info'] == 'true') {
+			$prog = new Program($programID, true);
+		} else {
+			$prog = new Program($programID);
+		}
+		
+		
+		echo '<h4 class="header">Required Courses</h4>';
 		
 		foreach ($prog->reqs as $r) {
 			echo '<div class="subheader">'. $r->title .' ('. $r->credits .' cr)</div>';
@@ -35,11 +44,9 @@
 				}
 				
 				// Output course button
-				echo '<button type="button" class="btn cbtn '. $btnClass .'" id="'. $c->prefix . $c->courseNumber .'">'. strtoupper($c->prefix .'-'. $c->courseNumber) .'</button>';
+				//echo '<button type="button" class="btn cbtn '. $btnClass .'" id="'. $c->prefix . $c->courseNumber .'">'. strtoupper($c->prefix .'-'. $c->courseNumber) .'</button>';
 				
-				//echo '<a id="popoverData" class="btn cbtn '. $btnClass .'" data-content="'. $c->description .'" rel="popover" data-placement="bottom" data-original-title="'. $c->title .'" data-trigger="hover">'. strtoupper($c->prefix .'-'. $c->courseNumber) .'</a>';
-				
-				//echo '<button type="button" class="btn cbtn '. $btnClass .'" id="'. $c->prefix . $c->courseNumber .'" data-content="'. $c->data->description .'" rel="popover" data-placement="bottom" data-original-title="'. $c->data->title .'" data-trigger="hover">'. strtoupper($c->prefix .'-'. $c->courseNumber) .'</button>';
+				echo '<button type="button" class="btn cbtn '. $btnClass .'" id="'. $c->prefix . $c->courseNumber .'" data-content="'. substr($c->data->description, 0, min(strlen($c->data->description), 100)) .'..." rel="popover" data-placement="bottom" data-original-title="'. $c->data->title .'" data-trigger="hover">'. strtoupper($c->prefix .'-'. $c->courseNumber) .'</button>';
 			}
 			
 			echo '</div>';

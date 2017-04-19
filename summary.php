@@ -33,10 +33,8 @@
 						
 	} else {
 		// Redirect to login page with error
-		header("location:login.php?program_error=true");
+		header("location:login.php?data_error=true");
 	}
-	
-
 ?>
 
 <!DOCTYPE html>
@@ -68,17 +66,6 @@
 		<div class="container">
 		
 			<div class="row">
-				
-				<!-- <div class="col-3">
-					<h6 class="header">Completed</h6>
-					<div id="completed">
-						<?php
-							/*foreach ($_SESSION['completed'] as $c) {
-								echo $c .'<br>';
-							}*/
-						?>
-					</div>
-				</div> 
 				
 				<!-- List of [need] array -->
 				<div class="col-md-3 col-sm-6">
@@ -121,7 +108,11 @@
 				
 				<!-- Option Columns [plus some test output] -->
 				<div class="col-md-3 col-sm-6">
-					<h6 class="header">Options <small class="extrafade">[Coming soon]</small></h6>
+					<!-- <h6 class="header">Upcoming</h6>
+					<div id="upcoming"></div>
+					<br>
+					
+					<h6 class="header">Options <small class="extrafade">[Doesn't work]</small></h6>
 					<form>
 						<div class="form-check">
 							<label class="form-check-label small">
@@ -131,14 +122,14 @@
 						</div>
 						<div class="form-check">
 							<label class="form-check-label small">
-								<input type="checkbox" class="form-check-input" checked="true">
+								<input type="checkbox" class="form-check-input">
 								Show completed courses
 							</label>
 						</div>
 					</form>
 					
-					<br>
-					<h6 class="header">Departments<br><small class="extrafade">Yeah, this doesn't work yet either..</small></h6>
+					<br> -->
+					<h6 class="header">Departments</h6>
 					<div id="test">
 						<form id="depts"></form>
 					</div>
@@ -146,24 +137,19 @@
 
 				<!-- Available Section [COL-6 / COL-12] -->
 				<div class="col-md-6 col-sm-12">
-					<div class="row">
-						
-						<ul class="nav nav-tabs" id="tabs" role="tablist">
-						</ul>
-						
-					</div><br>
+				
+					<!-- TABS -->
+					<ul class="nav nav-tabs" id="tabs" role="tablist"></ul>
+					<br>
+					
+					<!-- Constant text -->
 					<div class="row">
 						<div class="col-10"><h6>Course Details</h6></div>
 						<div class="col-2"><h6>Seats</h6></div>
 					</div>
-					<table class="table table-striped" id="available">
-						<tbody>
-						
-							<div class="tab-content" id="content">
-							</div>
-						
-						</tbody>
-					</table>
+					
+					<!-- TAB - CONTENT - Tab-Panes will be populated here -->
+					<div class="tab-content" id="content"></div>
 				</div>
 			
 			</div><!-- row -->
@@ -195,29 +181,17 @@
 		_completed = JSON.parse(result).completed;
 		_current = JSON.parse(result).current;
 		
+		// Courses still needed
 		_need = <?php echo json_encode($need); ?>;
 		
+		// Current term & array of terms
 		_term = <?php echo "'". $GLOBALS['current_term'] ."'"; ?>;
 		_terms = <?php echo json_encode($GLOBALS['terms']); ?>;
 		
-		// Populate term tabs
-		for (var t in _terms) {
-			
-			// Create term id
-			termRef = new Term(_terms[t]);
-			termID = termRef.year + termRef.season;
-			
-			if (_terms[t] == _term) {
-				$('#tabs').append('<li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#' + termID +'" role="tab">' + _terms[t] + '</a></li>');
-				//$('#content').append('<div class="tab-pane active" id="home" role="tabpanel">' + termID + ' text' + '</div>');
-			} else {
-				$('#tabs').append('<li class="nav-item"><a class="nav-link" data-toggle="tab" href="#' + termID +'" role="tab">' + _terms[t] + '</a></li>');
-				//$('#content').append('<div class="tab-pane" id="' + termID + '" role="tabpanel">' + termID + ' Text' + '</div>');
-			}
-		}
+		var currentTerm = new Term(_term).full;
 		
-		// FROM [_need] determine which departments will be needed
-		var depts = new Array();
+		// List of deptartments still need for search queries
+		var _depts = new Array();
 		
 		// Go through array of needed course strings
 		for (var i in _need) {
@@ -225,19 +199,92 @@
 			// Department ref
 			d = new Course(_need[i]).prefix;
 			
-			// Only if 
-			if (depts.indexOf(d) == -1) {
+			// Add new department search
+			if (_depts.indexOf(d) == -1) {
 				
 				// Add department string to 'depts' array from courses prefixes
-				depts.push(d);
-				// test output
-				$('#depts').append('<div class="form-check"><label class="form-check-label"><input type="checkbox" class="form-check-input" checked="true"> ' + d.toUpperCase() + '</label></div>');
+				_depts.push(d);
 				
-				// Request each department
-				$.get('https://api.svsu.edu/courses?prefix=' + d + '&term=' + _term, function(data) {
+				// Create dept checkboxes
+				$('#depts').append('<div class="form-check"><label class="form-check-label"><input type="checkbox" class="form-check-input" id="' + d + '_check" checked="true"> ' + d.toUpperCase() + '</label></div>');
+				$('#' + d + '_check').change(function() {
 					
+					deptName = $(this).parent().text().substr(1);
+					for (var t in _terms) {
+						var termName = new Term(_terms[t]).full;
+						
+						if ($(this).prop('checked') == false) {
+							$('#' + termName + '_' + deptName).animate({
+																opacity: 0,
+																height: "toggle"
+															  });
+						} else {
+							$('#' + termName + '_' + deptName).animate({
+																opacity: 1,
+																height: "toggle"
+															  });
+						}
+					}
+						
+				});
+				// Event - Change - dept checks
+				
+			}
+		}
+		/* Everything above here is DATA PROCESSING for the page */
+		
+		
+		
+		/* -------------------------
+			PAGE LAYOUT BEGINS HERE
+		   ------------------------- */
+		
+		// TERM LAYOUT - DEPENDENT ON API.COURSES 
+		/* - So this section subdivides out content column into tabs each representing a single term */
+		// Prepare tab & content divs
+		for (var t in _terms) {
+			
+			// Create term id
+			termRef = new Term(_terms[t]);
+			termID = termRef.full;
+			
+			if (_terms[t] == _term) {
+				$('#tabs').append('<li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#' + termID +'" role="tab"><strong>' + _terms[t] + '</strong></a></li>');
+				$('#content').append('<div class="tab-pane fade show active" id="' + termID + '" role="tabpanel"></div>');
+			} else {
+				$('#tabs').append('<li class="nav-item"><a class="nav-link" data-toggle="tab" href="#' + termID +'" role="tab">' + _terms[t] + '</a></li>');
+				$('#content').append('<div class="tab-pane fade" id="' + termID + '" role="tabpanel"></div>');
+			}
+			
+			// Finally append a table to each TAB-PANE
+			//$('#' + termID).append('<table class="table table-striped"><tbody id="' + termID + '_table"></tbody></table>');
+			$('#' + termID).append('<table class="table table-striped" id="' + termID + '_table"></table>');
+			
+			
+			// DEPARTMENT LAYOUT - DEPENDENT ON [_need]
+			/* - Each term tab-pane will have a tbody for each department
+			   - Ensures course results will always display in order */
+			for (var i in _depts) {
+				
+				// Add a <tbody> for every department
+				$('#' + termID + '_table').append('<tbody id="' + termID + '_' + _depts[i].toUpperCase() + '"></tbody>');
+				
+			}
+		}
+		
+		
+		/* ----------------
+			LOAD PROCESSES
+		   ---------------- */
+		// Request every department through COURSES.API
+		for (var t in _terms) {
+			for (var d in _depts) {
+				
+				// Request each department individually
+				$.get('https://api.svsu.edu/courses?prefix=' + _depts[d] + '&term=' + _terms[t], function(data) {
+						
+					// Create array only containing needed course strings
 					var show = new Array();
-					
 					for (var i in data.courses) {
 						c = data.courses[i];
 						if (_need.indexOf(c.prefix.toLowerCase() + c.courseNumber) != -1) {
@@ -245,46 +292,45 @@
 						}
 					}
 					
+					// Determine tab-pane id
+					paneID = new Term(data.courses[0].term).full;
+					tbodyID = data.courses[0].prefix;
+					
 					// Update 'available' column
-					updateCourses(show);
+					for (var k in show) {
+						// Update tab-page with table structure
+						//$('#' + paneID + '_table').append('<tr><td>' + drawSection(show[k]) + '</td></tr>');
+						$('#' + paneID + '_' + tbodyID).append('<tr><td>' + drawSection(show[k]) + '</td></tr>');
+					}
 					
 				});
+				
 			}
 		}
 		
+		// Event - Tab Click
+		$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+			var target = $(e.target).attr("href");
+			currentTerm = target.substr(1);
+		});
+		
 	});
 	
-	
-	
-	
-	
-	function updateCourses (courses, clear = false)
-	{
-		// FOR NOW clear out output div for a fresh set of courses	
-		if (clear) {
-			$('#available > tbody').html('');
-		}
+	function drawSection (c) {
 		
-		// Loop variables
-		var c, mt, cHTML;
-		
-		// Draw EVERY course in [courses]
-		for (var i in courses) {
+		// Start new course HTML
+		cHTML = '';
 			
-			// Course ref
-			c = courses[i];
-		
-			// Start new course HTML
-			cHTML = '';
-			
-			cHTML += '<div class="row">';
+		cHTML += '<div class="row">';
 						
-				cHTML += '<div class="col-10">';
+			cHTML += '<div class="col-10">';
 							
-					cHTML += '<b class="h5">' + c.prefix + '-' + c.courseNumber + '</b> - <span class="faded"><b class="h6">' + c.title + '</b> (' + c.credit + ' cr)</span>';
-					cHTML += '<div class="row">';
-								
-						cHTML += '<div class="col-6 offset-1">';
+				cHTML += '<b class="h5">' + c.prefix + '-' + c.courseNumber + '</b> - <span class="faded"><b class="h6">' + c.title + '</b> (' + c.credit + ' cr)</span>';
+				cHTML += '<div class="row">';
+							
+					cHTML += '<div class="col-6 offset-1">';
+						
+						cHTML += '<p class="meetingtimes">';
 							
 							// Check for online
 							if (c.meetingTimes[0].method == "ONL") {
@@ -292,42 +338,47 @@
 							// Check for TBA
 							} else if (c.meetingTimes[0].room == "TBA"){
 								cHTML += '<b>[TBA]</b><br>';
-							}else {
+							} else {
 								// Add all meetins times
 								for (var j in c.meetingTimes) {
 									// Loop ref
 									mt = c.meetingTimes[j];
-											
+												
 									// Add meeting time
 									cHTML += '<b>' + mt.days + '</b> [' + mt.startTime + ' - ' + mt.endTime + ']<br>';
 								}
 							}
 									
-						cHTML += '</div>';
-						cHTML += '<div class="col-5"><span class="text-right">';
-										
-							cHTML += '<small class="extrafade">Sec</small> ' + c.section + ' <small class="extrafade">Line#</small> ' + c.lineNumber;
-									
-						cHTML += '</span></div>';
-								
+						cHTML += '</p>';
+					
 					cHTML += '</div>';
-					cHTML += '<div class="row"><div class="col-11 offset-1">';
 					
-						cHTML += '<small>' + c.prerequisites + '</small>';
-						//cHTML += '<small class="fade">' + c.prerequisites + '</small>';
-					
-					cHTML += '</div></div>';
+					cHTML += '<div class="col-5"><span class="text-right">';
+										
+						cHTML += '<small class="extrafade">Sec</small> ' + c.section + ' <small class="extrafade">Line#</small> ' + c.lineNumber;
+						cHTML += '<br><small class="extrafade">' + c.instructors[0].name + '</small>';
+									
+					cHTML += '</span></div>';
 								
 				cHTML += '</div>';
-				cHTML += '<div class="col-2"><p class="text-center">' + c.seatsAvailable + '/' + c.capacity + '</p></div>';
+				cHTML += '<div class="row"><div class="col-11 offset-1">';
 					
+					cHTML += '<small class="extrafade">' + c.prerequisites + '</small>';
+					
+				cHTML += '</div></div>';
+								
 			cHTML += '</div>';
+			cHTML += '<div class="col-2">';
+				
+				cHTML += '<p class="text-center seats">' + c.seatsAvailable + '/' + c.capacity + '</p>';
+				//cHTML += '<div class="text-center"><span class="badge badge-default">Save</span></div>';
 			
-			// FOR NOW - this will always update the 'available' div (col-6)
-			$('#available > tbody:last').append('<tr><td>' + cHTML + '</td></tr>');
-		}
+			cHTML += '</div>';
+					
+		cHTML += '</div>';
+		
+		return cHTML;
 	}
-	
 	
 	// CLASS - convert course string into an object with two props: prefix, number
 	function Course (courseString) {
@@ -343,8 +394,6 @@
 		this.year = termString.slice(0, slash);
 		this.season = termString.slice(slash + 1);
 		
-		/*this.format = function () {
-			return this.year + '-' this.season;
-		}*/
+		this.full = this.season + this.year;
 	}
 </script>

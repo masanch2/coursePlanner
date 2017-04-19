@@ -33,7 +33,7 @@
 					<h4 class="header">Search for Courses</h4>
 						
 					<div class="form-group">
-						<label>Course Prefix</label>
+						<label>Department</label>
 						<input type="text" class="form-control" id="coursePrefix" value="cis">
 					</div>
 					<div class="form-group">
@@ -43,14 +43,6 @@
 						
 					<button class="btn btn-success" id="getCourse">Get</button>
 					
-					<hr>
-					
-					<samp id="test"><strong>[Note]</strong> This won't alter your courses yet, but you can still search for them!</samp>
-					
-					<br><br><br>
-					
-					<div id="json"></div>
-				
 				</div>
 				<div class="col-md-6">
 				
@@ -79,14 +71,6 @@
 </html>
 
 <script>
-	
-	// On Resize - fix output height
-	//$(document).ready(fixOutput);
-	//$(window).resize(fixOutput);
-
-	function fixOutput() {
-		$("#output").height($(window).height()-200);
-	}
 
 	// 'Get' - onClick
 	$("#getCourse").click(function () {
@@ -112,9 +96,15 @@
 				// Create accordian div
 				$("#output").append('<div id="accordion" role="tablist" aria-multiselectable="true">');
 				
-				var c = data.courses;
+				var c;
+				var shown = new Array();
 				for (var i in data.courses) {
-					$("#accordion").append(drawAccordianCard (data.courses[i], i));
+					c = data.courses[i];
+					
+					if (shown.indexOf(c.prefix + c.courseNumber) < 0) {
+						shown.push (c.prefix + c.courseNumber);
+						$("#accordion").append(drawAccordianCard (c, i));
+					}
 				}
 				
 			});
@@ -129,16 +119,16 @@
 		html += 	'<div class="card-header" role="tab" id="heading' + i + '">';
 		html += 	  '<h5 class="mb-0 float-left">';
 		html += 		'<a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse' + i + '" aria-expanded="false" aria-controls="collapse' + i + '">';
-		html += 		  c.prefix + "-" + c.courseNumber + " - " + c.title;
+		html += 		  c.prefix + "-" + c.courseNumber + " - " + c.title + ' (' + c.credit + ')';
 		html += 		'</a>';
 		html += 	  '</h5>';
-		html +=		  '<span class="float-right">';
-		html +=		 	'<input type="checkbox">';
-		html +=		  '</span>';
+		//html +=		  '<span class="float-right">';
+		//html +=		  '</span>';
 		html += 	'</div>';
 		html += 	'<div id="collapse' + i + '" class="collapse" role="tabpanel" aria-labelledby="heading' + i + '">';
 		html += 	  '<div class="card-block">';
 		html += 		'<p class="card-text"><small>' + c.description + '</small></p>';
+		html +=			'<small><strong>Prereq.</strong> ' + c.prerequisites + '</small>';
 		html += 	  '</div>';
 		html += 	'</div>';
 		html += '</div><!-- card -->';

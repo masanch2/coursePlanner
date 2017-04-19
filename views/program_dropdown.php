@@ -1,7 +1,13 @@
 	<select class="form-control" id="programDropdown" name="program">
 		<option value="">-</option>
 		<?php
-			$string = file_get_contents("data/programs.json");
+		
+			// Works for ajax call
+			$string = file_get_contents("../data/programs.json");
+			
+			// This is for php include
+			if (!$string) $string = file_get_contents("data/programs.json");
+			
 			$programs = json_decode($string);
 										
 			foreach ($programs as $id => $p) {

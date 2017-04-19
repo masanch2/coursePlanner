@@ -40,11 +40,8 @@
 			// Check db for login data
 			$result = mysql_query("SELECT * FROM users WHERE id='$id'");
 			
-			// Mysql_num_row is counting table row
-			$count = mysql_num_rows($result);
-			
 			// If result matched $myusername and $mypassword, table row must be 1 row
-			if($count==1){
+			if(mysql_num_rows($result)==1){
 				$u = mysql_fetch_assoc($result);
 			}
 		}

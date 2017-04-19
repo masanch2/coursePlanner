@@ -84,7 +84,7 @@
 					
 					<br><br>
 					<h6 class="header">From here you can:</h6>
-					- <a href="index.php">Add courses</a><br>
+					- <a href="progress.php">Add courses</a><br>
 					- <a href="summary.php">Check upcoming classes</a><br>
 					- <a href="profile.php">Edit your profile</a>
 				
@@ -124,8 +124,13 @@
 		_completed = JSON.parse(result).completed;
 		
 		$("#test").html("");
+		
 		for (var i in _completed) {
 			$("#test").append(_completed[i] + "<br>");
+		}
+		
+		if ($('#test').html() == '') {
+			$('#test').append('<br><br><div class="extrafade text-center">No completed courses!</div>');
 		}
 	});
 	

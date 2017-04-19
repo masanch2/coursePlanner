@@ -9,6 +9,6 @@
 	unset($_SESSION['current']);  
 	unset($_SESSION['completed']);  
 	
-	header("Location: ../login.php");
+	header("Location: ../index.html");
 	
 ?>

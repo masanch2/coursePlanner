@@ -32,7 +32,7 @@
 				<!-- Form Column-->
 				<div class="col-md-6 col-sm-12">
 				
-					<h4 class="header">Select program</h4>
+					<h4 class="header">Academic Program</h4>
 					
 					<!-- Degree Dropdown -->
 					<div class="form-group">
@@ -45,25 +45,29 @@
 					<!-- Reset Button
 					<button class="btn btn-secondary" id="reset">Reset</button> -->
 					
+					
 					<span id="saveResult"></span>
 					
-					<br><br><br><br>
-					
-					<!-- Save Report ->
-					<div class="subheader">DB Report</div>
-					<samp id="report"></samp>
-					
-					<br><br>-->
-					
-					<!-- Test Data
-					<div class="subheader">$_SESSION['courses'] <i>array</i></div>
-					<samp id="test"></samp> -->
-				
+					<br><br>
+					<!-- Load course info -->
+					<label class="form-check-label extrafade">
+					  <input id="loadCheck" class="form-check-input" type="checkbox"> Load course info [Use at own risk]
+					</label>
+					<!--
+					<blockquote class="blockquote">
+						<div class="form-group">
+							<label>Ready to see upcoming courses?</label>
+							<div id="progDropdown"></div>
+							<small class="form-text small text-muted">Click 'Save' after you have selected every completed course!</small>
+  						</div>
+						<button class="btn btn-secondary" id="seeReqs">See Summary</button>
+					</blockquote>-->
 				</div>
 				
 				<!-- Results Column -->
 				<div class="col-md-6 col-sm-12">
 				
+					
 					<p id="output"></p>
 				
 				</div>
@@ -101,44 +105,28 @@
 		_current = JSON.parse(result).current;
 		_program = JSON.parse(result).program;
 		
-		// TESTING - Output array for testing purposes
-		//updateDBReport ("#test");
 	});
-
-				
 	
-	/*/ 'Degree' Dropdown
-	//-------------------
-	$.getJSON('data/programs.json', function(data) {
-		
-		// Update 'Output' column
-		$('#programDropdown').change(function () {
-				
-			displayButtons(data[$(this).val()].requirements, '#output');
-			// Populate with buttons
-		});
-	})
-		.done (function(data) {
-			//displayButtons(data[$('#programDropdown').val()].requirements, '#output');
-		});*/
+	$('#loadCheck').change(function() {
+		loadProgram ($('#programDropdown').val(), '#output', this.checked);
+	});
 	
-	// WORKIN ON IT
 	// Draw initial buttons
-	loadProgram ($('#programDropdown').val(), '#output');
-	//$('#output').load('views/program_buttons.php?id=' + $('#programDropdown').val());
+	if ($('#programDropdown').val()) {
+		loadProgram ($('#programDropdown').val(), '#output', false);
+	}
 	
 	// Update 'Output' column
 	$('#programDropdown').change(function () {
 				
 		// Populate with buttons
-		loadProgram ($(this).val(), '#output');
+		loadProgram ($(this).val(), '#output', $('#loadCheck').prop('checked'));
 		
 		// Set guess program
 		_program = $(this).val();
 		
 		// Enable 'Save' button
 		$("#save").attr('disabled', false);
-		//$('#output').load('views/program_buttons.php?id=' + $(this).val());
 	});
 	
 	
@@ -155,21 +143,26 @@
 			$("#saveResult").delay(700).fadeOut("slow");
 			
 			// Update navbar with summary
-			$('#pageHeader').load('navbar.php');
+			if (!_program) {
+				$('#summaryLink > a').addClass('disabled');
+			} else if ($('#summaryLink > a').hasClass('disabled')) {
+				$('#summaryLink > a').removeClass('disabled');
+			}
 			
-			// TESTING - Output array for testing purposes
-			//updateDBReport ("#test");
 		});
 		
 	});
 		
 	// FUNCTION - 
-	function loadProgram (programID, outputID) {
-		$(outputID).load('views/program_buttons.php?id=' + programID, function() {
-			
+	function loadProgram (programID, outputID, loadInfo = false) {
 		
-			//$('.cbtn').popover({ trigger: "hover" });
+		$(outputID).html('<br><br><br><br><br><h1 class="display-4 text-center extrafade">Loading...</h1>');
+		$(outputID).load('views/program_buttons.php?id=' + programID + '&info=' + loadInfo, function() {
 			
+			//
+			// Enable popovers
+			if (loadInfo) 
+				$('.cbtn').popover();
 			
 			// Button Event - Setup button toggle
 			//	- each click adds or removes a courses from '_completed' array
@@ -195,6 +188,8 @@
 					_completed.splice(index, 1);
 				}
 				
+				
+				// FUNCTIONALITY FOR IMCOMPLETE / COMPLETED / CURRENT
 				/*/ Set - COMPLETED
 				if ($(this).hasClass('btn-secondary')) { 
 					$(this).removeClass('btn-secondary');
@@ -205,7 +200,7 @@
 						_completed.push ($(this).attr('id'));
 					}
 					
-				// Set - CURRENTLY
+				// Set - CURRENT
 				} else if ($(this).hasClass('btn-success')) {
 					
 					$(this).removeClass('btn-success');
@@ -241,6 +236,12 @@
 	
 	
 	
+	
+	
+	
+	
+	// OLD REPORT FUNCIONALITY
+	//  - SAVE_SESSION.PHP STILL PRODUCES REPORT OBJECT!!
 	// FUNCTION - updates <div="[output_ID param]"> with test data
 	function updateDBReport (outputID) {
 		
@@ -253,6 +254,7 @@
 		$("#report").html(_report);
 	}
 	
+	// OLD JAVASCRIPT VERSION OF PAGE
 	// FUNCTION - Display degree requirements
 	//	- as 2-state buttons
 	function displayButtons (reqJSON, outputID) {

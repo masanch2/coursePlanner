@@ -1,58 +1,3 @@
- <?php
-	
-	session_start();
-	
-	if (isset($_POST['user']) && isset($_POST['pass'])) {
-		$user = $_POST['user'];
-		$pass = $_POST['pass'];
-		$pass2 = $_POST['pass2'];
-		$program = $_POST['program'];
-		
-		// connect to database
-		$conn = mysql_connect('localhost', 'masanch2', '495297') or die (mysql_error());
-		
-		$db = mysql_select_db('masanch2', $conn);
-		
-		
-		if ($pass == $pass2) {
-			$sql="SELECT * FROM users WHERE username='$user' and password='$pass'";
-			$result=mysql_query($sql);
-					
-			// Mysql_num_row is counting table row
-			$count=mysql_num_rows($result);
-			
-			if (!$count) {
-				
-				echo $program;
-				// Insert new user info into DB
-				$query = "INSERT INTO users (username, password, program, date_joined) VALUES ('$user', '$pass', '$program', '". time() ."')";
-				mysql_query($query) or die ('query failed');
-				
-				// Now, select user info to get ID
-				$sql = "SELECT * FROM users WHERE username='$user' and password='$pass'";
-				$result = mysql_query($sql);
-				$id = mysql_fetch_assoc($result)['id'];
-				
-				// Set session vars
-				$_SESSION['user_id'] = $id;
-				$_SESSION['user_name'] = $user;
-				$_SESSION['user_program'] = $program;
-				
-				header("location:dashboard.php");
-			} else {
-				echo "User name already exists.";
-			}
-			
-		} else {
-			echo "Passwords don't match!";
-		}
-		
-		mysql_close();
-	}
-	
-	
-?>
-		
 
 <!DOCTYPE html>
 <html lang="en">
@@ -75,24 +20,26 @@
   <body>
 	
 		<!-- Page Header -->
-		<div class="pageHeader">
-			<?php require 'navbar.php'; ?>
-		</div>
+		<div class="pageHeader"></div>
 
 		<div class="container">
 		
 			<div class="row">
 			
 				<div class="col-md-4">
+						
+						<h4 class="header">New User Registration</h4>
+						
+						<div id="error"></div> 
 	
-					<form class="form" action='register.php' enctype='multipart/form-data' method='post'>
 						<div class="form-group">
 							<label>Username</label><br>
-							<input class="form-control" type='text' name="user" <?php if (isset($_POST['user'])) echo 'value="'. $_POST['user'] .'"'; ?>/>
+							<input class="form-control" type='text' name="user" />
 						</div>
 						<div class="form-group">
 							<label>Password</label><br>
 							<input class="form-control" type='password' name="pass" />
+							<small class="form-text text-danger">Passwords are NOT hashed!</small>
 						</div>
 						<div class="form-group">
 							<label>Retype Password</label><br>
@@ -100,12 +47,11 @@
 						</div>
 						<div class="form-group">
 							<label>Program</label>
-							<?php include 'views/program_dropdown.php'; ?>
+							<div id="progDropdown"></div>
 							<small class="form-text text-muted">You can change this at any time.</small>
   						</div>
 						<br>
-						<input class="btn btn-primary" type='submit' text="Register" />
-					</form>
+						<button class="btn btn-primary" id="register">Register</button>
 		
 				</div>
 		
@@ -131,13 +77,33 @@
 </html>
 
 <script>
-	
-	// CLASS - convert course string into an object with two props: prefix, number
-	function Course (courseString) {
-		var firstDigit = courseString.indexOf(courseString.match(/\d/));
+
+	// Load navbar & program dropdown
+	$('.pageHeader').load('navbar.php');
+	$('#progDropdown').load('views/program_dropdown.php');
+
+
+	// Event - 'Register' button
+	$('#register').click(function(data) {
 		
-		this.prefix = courseString.slice(0, firstDigit);
-		this.number = courseString.slice(firstDigit, courseString.length);
-	}
+		// Collect form vars
+		var user = $('input[name="user"]').val();
+		var pass1 = $('input[name="pass"]').val();
+		var pass2 = $('input[name="pass2"]').val();
+		var program = $('#programDropdown').val();
+		
+		// Post form data
+		$.post( "scripts/register.php", { user: user, pass: pass1, pass2: pass2, program: program } )
+		
+			// Handle form response
+			.done(function (data) {
+				if (!$.trim(data)) {
+					window.location.href = "dashboard.php";
+				} else {
+					$('#error').html('<div class="alert alert-danger" role="alert">' + data + '</div>');
+				}
+				
+			});
+	});
 	
 </script>
