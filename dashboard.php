@@ -71,16 +71,23 @@
 				
 					<h5 class="header">Welcome, <?php echo $u['username']; ?></h5>
 					
-					<p>
-						<strong>Program:</strong> <?php echo $u['program'] ? $prog->title .' ('. $prog->type .')' : 'Undecided'; ?>
-					</p>
-					<p>
-						<strong>Profile:</strong>
-						
-						<br>
-						<?php echo $u['profile']; ?>
-						
-					</p>
+					<div class="row">
+						<div class="col-10">
+							<p>
+								<strong>Program:</strong> <?php echo $u['program'] ? $prog->title .' ('. $prog->type .')' : 'Undecided'; ?>
+							</p>
+							<p>
+								<strong>Profile:</strong>
+								
+								<br>
+								<?php echo $u['profile']; ?>
+								
+							</p>
+						</div>
+						<div class="col-2">
+							<?php echo '<img class="img-thumbnail" src="data:image/jpeg;base64,'.base64_encode( $u['picture'] ).'"/>'; ?>
+						</div>
+					</div>
 					
 					<br><br>
 					<h6 class="header">From here you can:</h6>

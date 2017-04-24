@@ -18,32 +18,60 @@
 			$program = $_POST['program'];
 			$profile = mysql_real_escape_string($_POST['profile']);
 			
-			// Update DB 'user' - last date logged in value
-			$sql = "UPDATE users SET program='". $program ."', profile='". $profile ."' WHERE id='". $_SESSION['user_id'] ."'";
-			mysql_query($sql);
-		
-			// Update SESSION vars
-			$_SESSION['user_program'] = $program;
-			
-			// Redirect to dash
-			header("location:dashboard.php");
-		
-		
-		/* All this just to display the profile..
-			Every other var needed is stored in the SESSION already! 
-		------------------------------------------------------------ */
-		} else {
-			
-			// Get id from session
-			$id = $_SESSION['user_id'];
+			// Only when file has been attached will no error occur
+			if ($_FILES['picture']['error'] == 0) {
+				
+				$filename = $_FILES['picture']['name'];
+				$tempname = $_FILES['picture']['tmp_name'];
+				$filesize = $_FILES['picture']['size'];
+				$filetype = $_FILES['picture']['type'];
+				if ($_FILES['picture']['size'] > 16777215) {
+					$upload_error = 'File must be smaller than 16Mb';
+				}
+				$filetype = (get_magic_quotes_gpc() == 0 ? mysql_escape_string($filetype) : mysql_escape_string(stripslashes($_FILES['picture'])));
 
-			// Check db for login data
-			$result = mysql_query("SELECT * FROM users WHERE id='$id'");
-			
-			// If result matched $myusername and $mypassword, table row must be 1 row
-			if(mysql_num_rows($result)==1){
-				$u = mysql_fetch_assoc($result);
+				$fp = fopen($tempname, 'r');
+				$content = fread($fp, filesize($tempname));
+				$content = addslashes($content);
+				fclose($fp);
+					
+				$sql = "UPDATE users SET program='". $program ."', profile='". $profile ."', picture='". $content ."' WHERE id='". $_SESSION['user_id'] ."'";
+				
+			} else {
+				$sql = "UPDATE users SET program='". $program ."', profile='". $profile ."' WHERE id='". $_SESSION['user_id'] ."'";
 			}
+			
+			
+			
+			if (!$upload_error) {
+				
+				// Update DB 'user' - last date logged in value
+				mysql_query($sql);
+			
+				// disconnect from database
+				Database::disconnect();
+				
+				// Update SESSION vars
+				$_SESSION['user_program'] = $program;
+				
+				// Redirect to dash
+				header("location:dashboard.php");
+			}
+		
+		}
+			
+		
+		/* This stuff only matters if the page isn't redirected..
+		------------------------------------------------------------ */
+		// Get id from session
+		$id = $_SESSION['user_id'];
+
+		// Check db for login data
+		$result = mysql_query("SELECT * FROM users WHERE id='$id'");
+			
+		// If result matched $myusername and $mypassword, table row must be 1 row
+		if(mysql_num_rows($result)==1){
+			$u = mysql_fetch_assoc($result);
 		}
 			
 		// disconnect from database
@@ -90,7 +118,9 @@
 				
 					<h4 class="header">Edit profile</h4>
 					
+					
 					<form class="form" action='profile.php' enctype='multipart/form-data' method='post'>
+					
 						<div class="form-group">
 							<label>Program</label>
 							<?php include 'views/program_dropdown.php'; ?>
@@ -99,13 +129,18 @@
 							<label>Profile</label>
 							<textarea class="form-control" name="profile" rows="3"><?php echo $u['profile']; ?></textarea>
 						</div>
+						<div class="form-group">
+							<label>Picture</label>
+							<input type="file" class="form-control-file" name="picture">
+						</div>
+						<?php if ($upload_error) echo '<div class="alert alert-danger" role="alert"><strong>Oh snap!</strong> '. $upload_error .'</div>' ?>
+						
+						<br>
 						<input type="submit" class="btn btn-primary" value="Save"/>
 						<a href="dashboard.php" class="btn btn-secondary">Nevermind</a>
 					</form>
 					
 				</div>
-			
-			
 			</div><!-- row -->
 
 			<hr>
